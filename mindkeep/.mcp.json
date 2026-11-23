@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mindkeep": {
+      "type": "http",
+      "url": "${user_config.server}/mcp"
+    }
+  }
+}
