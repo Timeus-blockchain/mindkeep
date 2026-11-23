@@ -1,7 +1,7 @@
 {
   "name": "mindkeep",
   "displayName": "Mindkeep",
-  "version": "1.59.0",
+  "version": "1.66.10",
   "description": "Connects Claude Code to your Mindkeep memory and task list, reminds Claude to use it at the start of every chat, and saves your sessions to your Mindkeep account (/mindkeep:connect).",
   "author": {
     "name": "Timeus Lab S.L."

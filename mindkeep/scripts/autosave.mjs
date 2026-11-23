@@ -8,6 +8,7 @@ import { dirname as dirname4, join as join4 } from "node:path";
 // src/autosave.ts
 import {
   closeSync,
+  existsSync,
   lstatSync,
   openSync,
   readFileSync as readFileSync2,
@@ -101,7 +102,11 @@ async function runAutosave(input, config, deps) {
   const hook = input ?? {};
   const main2 = safeSessionFile(hook.transcript_path, deps.claudeDir);
   if (!main2) {
-    deps.log("skip: the session file is not a .jsonl inside the Claude Code projects folder");
+    const p = hook.transcript_path;
+    const missing = typeof p === "string" && isAbsolute(p) && p.toLowerCase().endsWith(".jsonl") && !existsSync(p);
+    deps.log(
+      missing ? "skip: this session keeps no transcript (nothing to save)" : "skip: the session file is not a .jsonl inside the Claude Code projects folder"
+    );
     return { sent: 0, failed: 0 };
   }
   const state = deps.readState();
