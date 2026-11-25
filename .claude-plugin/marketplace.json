@@ -1,16 +1,16 @@
 {
-  "name": "mindkeep",
+  "name": "recadia",
   "owner": {
     "name": "Timeus Lab S.L."
   },
   "metadata": {
-    "description": "Mindkeep for Claude Code by Timeus Lab S.L."
+    "description": "Recadia for Claude Code by Timeus Lab S.L."
   },
   "plugins": [
     {
-      "name": "mindkeep",
-      "source": "./mindkeep",
-      "description": "Connects Claude Code to your Mindkeep memory and task list, reminds Claude to use it in every chat, and saves your sessions to your Mindkeep account."
+      "name": "recadia",
+      "source": "./recadia",
+      "description": "Connects Claude Code to your Recadia memory and task list, reminds Claude to use it in every chat, and saves your sessions to your Recadia account."
     }
   ]
 }

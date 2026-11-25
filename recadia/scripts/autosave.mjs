@@ -16,6 +16,7 @@ import {
   readdirSync,
   realpathSync
 } from "node:fs";
+import { gzipSync } from "node:zlib";
 import { basename, dirname as dirname2, isAbsolute, join as join2, sep } from "node:path";
 
 // src/disconnect.ts
@@ -59,7 +60,20 @@ function forgetConnection(configPath2, reason, now = Date.now()) {
 
 // src/autosave.ts
 var KEY_IN_TEXT = /roma_[A-Za-z0-9]+_[A-Za-z0-9_-]+/g;
-var MAX_CHUNK = 64 * 1024 * 1024;
+var MAX_CHUNK = 512 * 1024;
+var BUDGET_MS = 25e3;
+var SERVICE_LINE = /^\{"type":"(?:api-request|api-request-shape|api-request-blob|data-flow-records|file-history-snapshot)"/;
+var BINARY = /"(data|base64)":"([A-Za-z0-9+/=]{1000,})"/g;
+function withoutBallast(data) {
+  const text = data.toString("utf8").split("\n").filter((l) => l !== "" && !SERVICE_LINE.test(l)).map(
+    (l) => l.replace(
+      BINARY,
+      (_m, k, v) => `"${k}":"","bytes":${Math.floor(v.length * 3 / 4)}`
+    )
+  ).join("\n");
+  return Buffer.from(text ? `${text}
+` : "", "utf8");
+}
 function safeSessionFile(path, claudeDir) {
   if (typeof path !== "string" || !isAbsolute(path) || !path.toLowerCase().endsWith(".jsonl")) {
     return null;
@@ -86,17 +100,19 @@ function newLines(path, from) {
   const size = lstatSync(path).size;
   const start = from > size ? 0 : from;
   if (size <= start) return null;
-  const len = Math.min(size - start, MAX_CHUNK);
-  const buf = Buffer.alloc(len);
   const fd = openSync(path, "r");
   try {
-    readSync(fd, buf, 0, len, start);
+    for (let max = MAX_CHUNK; ; max *= 2) {
+      const len = Math.min(size - start, max);
+      const buf = Buffer.alloc(len);
+      readSync(fd, buf, 0, len, start);
+      const lastNl = buf.lastIndexOf(10);
+      if (lastNl >= 0) return { data: buf.subarray(0, lastNl + 1), end: start + lastNl + 1 };
+      if (len === size - start) return null;
+    }
   } finally {
     closeSync(fd);
   }
-  const lastNl = buf.lastIndexOf(10);
-  if (lastNl < 0) return null;
-  return { data: buf.subarray(0, lastNl + 1), end: start + lastNl + 1 };
 }
 async function runAutosave(input, config, deps) {
   const hook = input ?? {};
@@ -109,43 +125,54 @@ async function runAutosave(input, config, deps) {
     );
     return { sent: 0, failed: 0 };
   }
-  const state = deps.readState();
+  const deadline = Date.now() + (deps.budgetMs ?? BUDGET_MS);
   let sent = 0;
   let failed = 0;
-  for (const file of [main2, ...workerFiles(main2, deps.claudeDir)]) {
-    const chunk = newLines(file, state[file] ?? 0);
-    if (!chunk) continue;
-    try {
-      const res = await deps.fetch(
-        `${config.url.replace(/\/+$/, "")}/api/archive/session?name=${encodeURIComponent(basename(file))}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${config.key}`,
-            "Content-Type": "application/octet-stream"
-          },
-          body: new Uint8Array(chunk.data),
-          signal: AbortSignal.timeout(deps.timeoutMs ?? 2e4)
+  let gz = true;
+  files: for (const file of [main2, ...workerFiles(main2, deps.claudeDir)]) {
+    for (; ; ) {
+      const left = deadline - Date.now();
+      if (left < 1e3) break files;
+      const chunk = newLines(file, deps.readState()[file] ?? 0);
+      if (!chunk) break;
+      const body = withoutBallast(chunk.data);
+      try {
+        const res = body.length ? await deps.fetch(
+          `${config.url.replace(/\/+$/, "")}/api/archive/session?name=${encodeURIComponent(basename(file))}${gz ? "&gz=1" : ""}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${config.key}`,
+              "Content-Type": "application/octet-stream"
+            },
+            body: new Uint8Array(gz ? gzipSync(body) : body),
+            signal: AbortSignal.timeout(Math.min(deps.timeoutMs ?? 2e4, left))
+          }
+        ) : null;
+        if (res?.status === 400 && gz) {
+          await res.body?.cancel().catch(() => void 0);
+          gz = false;
+          continue;
         }
-      );
-      if (res.ok) {
-        state[file] = chunk.end;
-        sent++;
-      } else {
-        failed++;
-        const text = (await res.text().catch(() => "")).replace(KEY_IN_TEXT, "roma_\u2026");
-        deps.log(`HTTP ${res.status} for ${basename(file)}: ${text.slice(0, 300)}`);
-        if (keyRefused(res.status, text) && deps.onRejected) {
-          deps.onRejected(res.status);
+        if (res && !res.ok) {
+          failed++;
+          const text = (await res.text().catch(() => "")).replace(KEY_IN_TEXT, "roma_\u2026");
+          deps.log(`HTTP ${res.status} for ${basename(file)}: ${text.slice(0, 300)}`);
+          if (keyRefused(res.status, text) && deps.onRejected) {
+            deps.onRejected(res.status);
+            break files;
+          }
           break;
         }
+        if (res) sent++;
+        deps.writeState({ ...deps.readState(), [file]: chunk.end });
+      } catch (err) {
+        failed++;
+        deps.log(`not sent ${basename(file)}: ${String(err).replace(KEY_IN_TEXT, "roma_\u2026")}`);
+        break;
       }
-    } catch (err) {
-      failed++;
-      deps.log(`not sent ${basename(file)}: ${String(err).replace(KEY_IN_TEXT, "roma_\u2026")}`);
     }
   }
-  deps.writeState(state);
   return { sent, failed };
 }
 function readConfig(path) {
@@ -180,7 +207,7 @@ var log = (line) => {
 async function main() {
   const config = readConfig(configPath);
   if (!config) {
-    log("skip: autosave.json is missing (the autosave is off in Mindkeep)");
+    log("skip: autosave.json is missing (the autosave is off in Recadia)");
     return;
   }
   const chunks = [];

@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "mindkeep": {
+    "recadia": {
       "type": "http",
       "url": "${user_config.server}/mcp"
     }

@@ -1,0 +1,20 @@
+{
+  "name": "recadia",
+  "displayName": "Recadia",
+  "version": "2.13.0",
+  "description": "Connects Claude Code to your Recadia memory and task list, reminds Claude to use it at the start of every chat, and saves your sessions to your Recadia account (/recadia:connect).",
+  "author": {
+    "name": "Timeus Lab S.L."
+  },
+  "homepage": "https://recadia.timeuslab.com",
+  "privacyPolicyUrl": "https://recadia.timeuslab.com/privacy/",
+  "license": "UNLICENSED",
+  "userConfig": {
+    "server": {
+      "type": "string",
+      "title": "Recadia address",
+      "description": "Leave as is for the Recadia cloud. For your own server, its address, such as https://recadia.example.com (no /mcp at the end).",
+      "default": "https://recadia.timeuslab.com"
+    }
+  }
+}

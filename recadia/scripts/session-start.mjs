@@ -4,17 +4,17 @@
 var REMINDER_MAX = 2e3;
 var SOURCES = ["startup", "resume", "clear", "compact", "fork"];
 var CORE = [
-  "Mindkeep is the person's shared memory and task list for AI agents (MCP tools whose names end in __register_agent, __get_guide, __propose_memory; the server may have another name if the person added it by hand).",
+  "Recadia is the person's shared memory and task list for AI agents (MCP tools whose names end in __register_agent, __get_guide, __propose_memory; the server may have another name if the person added it by hand).",
   "- Before the first task of this chat, call register_agent, then get_guide, and follow the rules it returns. If register_agent shows waiting work, tell the person.",
   "- When the person states a decision, an agreement or a preference, propose it at once with propose_memory (several at once: propose_memories). Do not ask in chat first.",
-  '- If no Mindkeep tools are available, or they say you are not signed in, tell the person once, in one line: "Mindkeep is not connected: run /mcp, choose mindkeep and sign in." Then carry on with the task and do not repeat it.'
+  '- If no Recadia tools are available, or they say you are not signed in, tell the person once, in one line: "Recadia is not connected: run /mcp, choose recadia and sign in." Then carry on with the task and do not repeat it.'
 ];
 var LEAD = {
-  startup: "Mindkeep reminder for this new chat.",
-  clear: "Mindkeep reminder for this new chat.",
-  fork: "Mindkeep reminder for this chat.",
-  resume: "Mindkeep reminder for this resumed chat. If you already signed in to Mindkeep earlier in this chat, there is no need to do it again.",
-  compact: "Mindkeep reminder after the context was compacted. If you no longer remember Mindkeep's rules, call get_guide again."
+  startup: "Recadia reminder for this new chat.",
+  clear: "Recadia reminder for this new chat.",
+  fork: "Recadia reminder for this chat.",
+  resume: "Recadia reminder for this resumed chat. If you already signed in to Recadia earlier in this chat, there is no need to do it again.",
+  compact: "Recadia reminder after the context was compacted. If you no longer remember Recadia's rules, call get_guide again."
 };
 function reminderText(source) {
   return [LEAD[source], ...CORE].join("\n");

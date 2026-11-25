@@ -1,17 +1,17 @@
 Copyright (c) 2026 Timeus Lab S.L. All rights reserved.
 
-This repository holds the Mindkeep plugin for Claude Code and its catalog (the "Plugin").
+This repository holds the Recadia plugin for Claude Code and its catalog (the "Plugin").
 The Plugin is proprietary. It is not open source.
 
 You may install the Plugin in Claude Code and use it, free of charge, only to connect Claude
-Code to a Mindkeep account or to your own Mindkeep server, for as long as you use Mindkeep.
+Code to a Recadia account or to your own Recadia server, for as long as you use Recadia.
 
 You may not copy, modify, merge, publish, distribute, sublicense or sell the Plugin or any part
-of it, or use it with any service other than Mindkeep, except under a separate written
+of it, or use it with any service other than Recadia, except under a separate written
 agreement with the copyright holder. Copies made by Claude Code or GitHub when you install,
 update or view the Plugin are permitted.
 
-Mindkeep itself is governed by its own terms at https://mindkeep.timeuslab.com.
+Recadia itself is governed by its own terms at https://recadia.timeuslab.com.
 
 THE PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT
 SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM,
