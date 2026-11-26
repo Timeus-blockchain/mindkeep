@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 
-// src/autosave-main.ts
 import { appendFileSync, readFileSync as readFileSync3, writeFileSync as writeFileSync2 } from "node:fs";
 import { homedir as homedir2 } from "node:os";
 import { dirname as dirname4, join as join4 } from "node:path";
 
-// src/autosave.ts
 import {
   closeSync,
   existsSync,
@@ -19,7 +17,6 @@ import {
 import { gzipSync } from "node:zlib";
 import { basename, dirname as dirname2, isAbsolute, join as join2, sep } from "node:path";
 
-// src/disconnect.ts
 import { mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 function removeFile(path) {
@@ -58,7 +55,6 @@ function forgetConnection(configPath2, reason, now = Date.now()) {
   }
 }
 
-// src/autosave.ts
 var KEY_IN_TEXT = /roma_[A-Za-z0-9]+_[A-Za-z0-9_-]+/g;
 var MAX_CHUNK = 512 * 1024;
 var BUDGET_MS = 25e3;
@@ -184,22 +180,20 @@ function readConfig(path) {
   }
 }
 
-// src/connect.ts
 import { homedir, hostname } from "node:os";
 import { dirname as dirname3, join as join3 } from "node:path";
 var CONNECT_TIMEOUT_MS = 5 * 60 * 1e3;
 function defaultConfigPath(home = homedir()) {
-  return join3(home, ".mindkeep", "autosave.json");
+  return join3(home, ".recadia", "autosave.json");
 }
 
-// src/autosave-main.ts
 var configPath = process.argv[2] || defaultConfigPath();
 var dir = dirname4(configPath);
 var statePath = join4(dir, "autosave-state.json");
 var logPath = join4(dir, "autosave.log");
 var log = (line) => {
   try {
-    appendFileSync(logPath, `${(/* @__PURE__ */ new Date()).toISOString()} ${line}
+    appendFileSync(logPath, `${( new Date()).toISOString()} ${line}
 `);
   } catch {
   }
@@ -237,8 +231,6 @@ async function main() {
     },
     log,
     fetch,
-    // T2.23c: a refused key is dead for good (the computer was disconnected in the account): forget
-    // it, so later hooks skip at once instead of sending the same files to a closed door.
     onRejected: (status) => {
       forgetConnection(configPath, `HTTP ${status}`);
       log(

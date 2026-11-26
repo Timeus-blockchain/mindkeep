@@ -62,7 +62,7 @@ address" in `/config`, then restart Claude Code. For saving sessions, run
 | When | What runs | What it does |
 |---|---|---|
 | A chat starts, resumes or is compacted | `scripts/session-start.mjs` | Prints a short reminder for Claude. No files, no network |
-| Claude answers, before compaction, the session ends | `scripts/autosave.mjs` | Does nothing until you run `/recadia:connect`, except write a line to `~/.mindkeep/autosave.log` if that folder exists. After that it sends the new lines of this session's transcript, and of its subagents, to your Recadia server |
+| Claude answers, before compaction, the session ends | `scripts/autosave.mjs` | Does nothing until you run `/recadia:connect`, except write a line to `~/.recadia/autosave.log` if that folder exists. After that it sends the new lines of this session's transcript, and of its subagents, to your Recadia server |
 | You run `/recadia:connect` | `scripts/connect.mjs` | Opens the browser, listens on 127.0.0.1 for the answer (up to 5 minutes), sends your computer's name with the request, and stores the key |
 | Claude uses a Recadia tool | the `recadia` MCP server | Reads and proposes records in your account, after you sign in |
 
@@ -73,7 +73,7 @@ address" in `/config`, then restart Claude Code. For saving sessions, run
   The plugin has no analytics and contacts no other service.
 - Data is kept while your account exists; on request the account and its data are deleted. Details and contact:
   the [privacy policy](https://recadia.timeuslab.com/privacy/).
-- Files it keeps on this computer, in `~/.mindkeep`: the key (`autosave.json`), how far each session was sent
+- Files it keeps on this computer, in `~/.recadia`: the key (`autosave.json`), how far each session was sent
   (`autosave-state.json`), a log (`autosave.log`) and, after a disconnect, `disconnected.json`.
 - The scripts are bundled, not minified. They need Node.js 20 or later.
 
@@ -97,7 +97,7 @@ This removes the Recadia connection that came with the plugin, the start-of-chat
 saving hooks and the plugin's saved options. To also forget the catalog, run
 `claude plugin marketplace remove recadia`. A Recadia server you added by hand stays.
 
-The key for saving sessions is kept in `~/.mindkeep/autosave.json`, not in the settings of Claude Code,
+The key for saving sessions is kept in `~/.recadia/autosave.json`, not in the settings of Claude Code,
 and uninstalling does not delete it. To stop saving on this computer, delete that file, or disconnect the
 computer in your Recadia account.
 

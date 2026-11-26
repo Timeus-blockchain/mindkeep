@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-// src/session-start.ts
 var REMINDER_MAX = 2e3;
 var SOURCES = ["startup", "resume", "clear", "compact", "fork"];
 var CORE = [
@@ -44,7 +43,6 @@ function sessionStartOutput(stdin) {
   }
 }
 
-// src/session-start-main.ts
 var STDIN_WAIT_MS = 300;
 function outputFor(chunks) {
   try {

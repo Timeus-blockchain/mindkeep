@@ -1,7 +1,7 @@
 {
   "name": "recadia",
   "displayName": "Recadia",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "Connects Claude Code to your Recadia memory and task list, reminds Claude to use it at the start of every chat, and saves your sessions to your Recadia account (/recadia:connect).",
   "author": {
     "name": "Timeus Lab S.L."

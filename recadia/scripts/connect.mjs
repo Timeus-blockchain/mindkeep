@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-// src/connect-main.ts
 import { spawn } from "node:child_process";
 
-// src/connect.ts
 import { randomBytes } from "node:crypto";
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -12,7 +10,7 @@ import { dirname, join } from "node:path";
 var DEFAULT_SERVER = "https://recadia.timeuslab.com";
 var CONNECT_TIMEOUT_MS = 5 * 60 * 1e3;
 function defaultConfigPath(home = homedir()) {
-  return join(home, ".mindkeep", "autosave.json");
+  return join(home, ".recadia", "autosave.json");
 }
 var page = (title, text) => `<!doctype html><meta charset="utf-8"><title>Recadia</title><body style="font-family:system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem"><h1 style="font-size:1.4rem">${title}</h1><p>${text}</p></body>`;
 function computerName(raw = hostname()) {
@@ -128,7 +126,6 @@ ${link}`);
   });
 }
 
-// src/connect-main.ts
 function openBrowser(url) {
   try {
     const [cmd, args] = process.platform === "win32" ? ["rundll32", ["url.dll,FileProtocolHandler", url]] : process.platform === "darwin" ? ["open", [url]] : ["xdg-open", [url]];
@@ -136,7 +133,7 @@ function openBrowser(url) {
   } catch {
   }
 }
-var server = process.argv[2] || process.env.MINDKEEP_URL || DEFAULT_SERVER;
+var server = process.argv[2] || process.env.RECADIA_URL || DEFAULT_SERVER;
 if (!/^https?:\/\//.test(server)) {
   console.error("The server address must start with https:// (or http:// on this computer).");
   process.exit(1);

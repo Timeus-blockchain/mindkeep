@@ -14,4 +14,4 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/connect.mjs" $ARGUMENTS
 
 It opens the browser on the Recadia page "Connect a computer". Tell the person to sign in if asked and press "Allow". If the browser did not open, give the person the link the command printed.
 
-When the command finishes, tell the person in one line whether it is connected. Do not print, read or copy the file `~/.mindkeep/autosave.json`: it holds the key.
+When the command finishes, tell the person in one line whether it is connected. Do not print, read or copy the file `~/.recadia/autosave.json`: it holds the key.
